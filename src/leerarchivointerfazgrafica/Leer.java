@@ -7,6 +7,7 @@ package leerarchivointerfazgrafica;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.ByteBuffer;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -75,22 +76,27 @@ public class Leer extends javax.swing.JFrame {
     private void SelecArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelecArchivoActionPerformed
         // TODO add your handling code here:
         
+        
         JFileChooser fc = new JFileChooser();
         fc.showOpenDialog(null);
         File archivo = fc.getSelectedFile();
-        try{
-            FileReader fr = new FileReader(archivo);
-            BufferedReader br = new BufferedReader(fr);
-            String texto = "";
-            String linea = "";
-            while(((linea =br.readLine())!=null) ){
-                texto += linea+"\n";
-           }
-            LeerArchivo.setText(texto);
+        
+        try(FileReader fr = new FileReader(archivo);
+             BufferedReader br = new BufferedReader(fr)) {
+            
+            StringBuilder texto = new StringBuilder();
+            char[] buffer = new char[4000]; // Buffer de lectura
+            
+            int bytesRead;
+            while ((bytesRead = br.read(buffer)) != -1) {
+                texto.append(buffer, 0, bytesRead);
+            }
+            LeerArchivo.setText(texto.toString());
             JOptionPane.showMessageDialog(null,"Archivo leido correctamente");
             
         }
         catch(Exception e){
+            e.printStackTrace();
             
         }
         
